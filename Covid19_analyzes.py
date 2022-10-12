@@ -2,6 +2,9 @@ import pyodbc
 import pandas as pd
 import plotly.express as px
 from dash import Dash, dcc, html, Input, Output
+import dash_bootstrap_components as dbc
+from dash_bootstrap_templates import load_figure_template
+
 from dash.exceptions import PreventUpdate
 from plotly.subplots import make_subplots
 import time
@@ -79,207 +82,228 @@ available_informations_second_component = sorted(
 # dcc -> dash core components https://dash.plotly.com/dash-core-components
 # pltotly.express -> https://plotly.com/python/
 
+dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.min.css"
 
-app = Dash(__name__)
+load_figure_template("darkly")
+
+app = Dash(__name__, external_stylesheets=[dbc.themes.DARKLY, dbc_css])
 
 # ========================================================================
 # App layout
-app.layout = html.Div(
-    [
-        html.H1(
-            "Make your own analyzes and statistics for Covid19",
-            style={"text-align": "center"},
-        ),
-        html.Br(),
-        # H3 'Select countries'
-        html.Div(
-            [html.H3("Select countries", style={"text-align": "center"})],
-            style={"display": "inline-block", "left": "0%", "width": "50%"},
-        ),
-        # H3 'Select information to analyze'
-        html.Div(
-            [
-                html.H3(
-                    "Select information to analyze", style={"text-align": "center"}
+app.layout = dbc.Container(
+    html.Div(
+        [
+            html.H1(
+                "Make your own analyzes and statistics for Covid19",
+                style={"text-align": "center"},
+                className="p-3",
+            ),
+            html.Br(),
+            # H3 'Select countries'
+            html.Div(
+                [html.H3("Select countries", style={"text-align": "center"})],
+                style={"display": "inline-block", "left": "0%", "width": "50%"},
+            ),
+            # H3 'Select information to analyze'
+            html.Div(
+                [
+                    html.H3(
+                        "Select information to analyze", style={"text-align": "center"}
+                    ),
+                ],
+                style={"display": "inline-block", "left": "50%", "width": "50%"},
+            ),
+            html.Br(),
+            # Dropdown slct_country
+            html.Div(
+                html.Div(
+                    [
+                        dcc.Dropdown(
+                            id="slct_country",
+                            options=[
+                                {"label": location, "value": id_country}
+                                for id_country, _, location in available_countries
+                            ],
+                            multi=True,
+                            value=(38, 52, 71, 158, 201),
+                            clearable=False,
+                            style={"width": "600px"},
+                            placeholder="Select country",
+                        )
+                    ],
+                    style={
+                        "display": "flex",
+                        "align-items": "center",
+                        "justify-content": "center",
+                        "width": "100%",
+                    },
                 ),
-            ],
-            style={"display": "inline-block", "left": "50%", "width": "50%"},
-        ),
-        html.Br(),
-        # Dropdown slct_country
-        html.Div(
-            html.Div(
-                [
-                    dcc.Dropdown(
-                        id="slct_country",
-                        options=[
-                            {"label": location, "value": id_country}
-                            for id_country, _, location in available_countries
-                        ],
-                        multi=True,
-                        value=(38, 52, 71, 158, 201),
-                        clearable=False,
-                        style={"width": "600px"},
-                        placeholder="Select country",
-                    )
-                ],
-                style={
-                    "display": "flex",
-                    "align-items": "center",
-                    "justify-content": "center",
-                    "width": "100%",
-                },
+                style={"display": "inline-block", "left": "0%", "width": "50%"},
+                className="pb-3",
             ),
-            style={"display": "inline-block", "left": "0%", "width": "50%"},
-        ),
-        # Dropdown slct_info
-        html.Div(
+            # Dropdown slct_info
             html.Div(
-                [
-                    dcc.Dropdown(
-                        id="slct_info",
-                        options=[
-                            {
-                                "label": information.replace("_", " ").capitalize(),
-                                "value": information,
-                            }
-                            for information in available_informations
-                        ],
-                        multi=True,
-                        value=("new_cases_per_million", "new_deaths_per_milion"),
-                        clearable=False,
-                        style={"width": "600px"},
-                        placeholder="Select information",
-                    )
-                ],
-                style={
-                    "display": "flex",
-                    "align-items": "center",
-                    "justify-content": "center",
-                    "width": "100%",
-                },
-            ),
-            style={"display": "inline-block", "left": "50%", "width": "50%"},
-        ),
-        html.Br(),
-        dcc.Graph(id="first_graphs"),
-        # ========================================================================
-        # H3 'Select countries'
-        html.Div(
-            [html.H3("Select countries", style={"text-align": "center"})],
-            style={"left": "0%", "width": "100%"},
-        ),
-        # Dropdown slct_country2
-        html.Div(
-            html.Div(
-                [
-                    dcc.Dropdown(
-                        id="slct_country2",
-                        options=[
-                            {"label": location, "value": id_country}
-                            for id_country, _, location in available_countries
-                        ],
-                        multi=True,
-                        value=(38, 52, 71, 158, 201),
-                        clearable=False,
-                        style={"width": "600px"},
-                        placeholder="Select country",
-                    )
-                ],
-                style={
-                    "display": "flex",
-                    "align-items": "center",
-                    "justify-content": "center",
-                    "width": "100%",
-                },
-            ),
-            style={"display": "inline-block", "left": "0%", "width": "100%"},
-        ),
-        # Button slct_all_countries
-        dcc.Checklist(
-            id="slct_all_countries",
-            options=[{"label": "Select all countries", "value": "select_all"}],
-            style={
-                "display": "flex",
-                "align-items": "center",
-                "justify-content": "center",
-                "width": "100%",
-                "margin-top": "5px",
-            },
-        ),
-        # H3 'Select information to analyze' left
-        html.Div(
-            [html.H3("Select information to analyze", style={"text-align": "center"})],
-            style={"display": "inline-block", "left": "0%", "width": "50%"},
-        ),
-        # H3 'Select information to analyze' right
-        html.Div(
-            [
-                html.H3(
-                    "Select information to analyze", style={"text-align": "center"}
+                html.Div(
+                    [
+                        dcc.Dropdown(
+                            id="slct_info",
+                            options=[
+                                {
+                                    "label": information.replace("_", " ").capitalize(),
+                                    "value": information,
+                                }
+                                for information in available_informations
+                            ],
+                            multi=True,
+                            value=("new_cases_per_million", "new_deaths_per_milion"),
+                            clearable=False,
+                            style={"width": "600px"},
+                            placeholder="Select information",
+                        )
+                    ],
+                    style={
+                        "display": "flex",
+                        "align-items": "center",
+                        "justify-content": "center",
+                        "width": "100%",
+                    },
+                    className="dbc",
                 ),
-            ],
-            style={"display": "inline-block", "left": "50%", "width": "50%"},
-        ),
-        # Dropdown slct_info_from_dim_country
-        html.Div(
+                style={"display": "inline-block", "left": "50%", "width": "50%"},
+                className="pb-3",
+            ),
+            html.Br(),
+            dcc.Graph(id="first_graphs", className="pb-3"),
+            # ========================================================================
+            # H3 'Select countries'
             html.Div(
-                [
-                    dcc.Dropdown(
-                        id="slct_info_from_dim_country",
-                        options=[
-                            {
-                                "label": info.replace("_", " ").capitalize(),
-                                "value": info,
-                            }
-                            for info in col_names_dim_country
-                        ],
-                        multi=True,
-                        clearable=False,
-                        style={"width": "600px"},
-                        placeholder="Select information",
-                    )
-                ],
+                [html.H3("Select countries", style={"text-align": "center"})],
+                style={"left": "0%", "width": "100%"},
+                className="pt-5",
+            ),
+            # Dropdown slct_country2
+            html.Div(
+                html.Div(
+                    [
+                        dcc.Dropdown(
+                            id="slct_country2",
+                            options=[
+                                {"label": location, "value": id_country}
+                                for id_country, _, location in available_countries
+                            ],
+                            multi=True,
+                            value=(38, 52, 71, 158, 201),
+                            clearable=False,
+                            style={"width": "600px"},
+                            placeholder="Select country",
+                        )
+                    ],
+                    style={
+                        "display": "flex",
+                        "align-items": "center",
+                        "justify-content": "center",
+                        "width": "100%",
+                    },
+                ),
+                style={"display": "inline-block", "left": "0%", "width": "100%"},
+                className="pb-1",
+            ),
+            # Button slct_all_countries
+            dcc.Checklist(
+                id="slct_all_countries",
+                options=[{"label": "Select all countries", "value": "select_all"}],
                 style={
                     "display": "flex",
                     "align-items": "center",
                     "justify-content": "center",
                     "width": "100%",
+                    "margin-top": "5px",
                 },
+                className="pb-3",
             ),
-            style={"display": "inline-block", "left": "0%", "width": "50%"},
-        ),
-        # Dropdown slct_info2
-        html.Div(
+            # H3 'Select information to analyze' left
             html.Div(
                 [
-                    dcc.Dropdown(
-                        id="slct_info2",
-                        options=[
-                            {
-                                "label": information.replace("_", " ").capitalize(),
-                                "value": information,
-                            }
-                            for information in available_informations_second_component
-                        ],
-                        multi=True,
-                        clearable=False,
-                        style={"width": "600px"},
-                        placeholder="Select information",
+                    html.H3(
+                        "Select information to analyze", style={"text-align": "center"}
                     )
                 ],
-                style={
-                    "display": "flex",
-                    "align-items": "center",
-                    "justify-content": "center",
-                    "width": "100%",
-                },
+                style={"display": "inline-block", "left": "0%", "width": "50%"},
+                className="pt-1",
             ),
-            style={"display": "inline-block", "left": "50%", "width": "50%"},
-        ),
-        html.Br(),
-        dcc.Graph(id="second_graph"),
-    ]
+            # H3 'Select information to analyze' right
+            html.Div(
+                [
+                    html.H3(
+                        "Select information to analyze", style={"text-align": "center"}
+                    ),
+                ],
+                style={"display": "inline-block", "left": "50%", "width": "50%"},
+                className="pt-1",
+            ),
+            # Dropdown slct_info_from_dim_country
+            html.Div(
+                html.Div(
+                    [
+                        dcc.Dropdown(
+                            id="slct_info_from_dim_country",
+                            options=[
+                                {
+                                    "label": info.replace("_", " ").capitalize(),
+                                    "value": info,
+                                }
+                                for info in col_names_dim_country
+                            ],
+                            multi=True,
+                            clearable=False,
+                            style={"width": "600px"},
+                            placeholder="Select information",
+                        )
+                    ],
+                    style={
+                        "display": "flex",
+                        "align-items": "center",
+                        "justify-content": "center",
+                        "width": "100%",
+                    },
+                ),
+                style={"display": "inline-block", "left": "0%", "width": "50%"},
+                className="pb-3",
+            ),
+            # Dropdown slct_info2
+            html.Div(
+                html.Div(
+                    [
+                        dcc.Dropdown(
+                            id="slct_info2",
+                            options=[
+                                {
+                                    "label": information.replace("_", " ").capitalize(),
+                                    "value": information,
+                                }
+                                for information in available_informations_second_component
+                            ],
+                            multi=True,
+                            clearable=False,
+                            style={"width": "600px"},
+                            placeholder="Select information",
+                        )
+                    ],
+                    style={
+                        "display": "flex",
+                        "align-items": "center",
+                        "justify-content": "center",
+                        "width": "100%",
+                    },
+                ),
+                style={"display": "inline-block", "left": "50%", "width": "50%"},
+                className="pb-3",
+            ),
+            html.Br(),
+            dcc.Graph(id="second_graph", className="pb-5"),
+        ],
+        className="dbc",
+    )
 )
 
 # ========================================================================
@@ -378,6 +402,7 @@ def update_graph(option_slctd, info_slctd):
                 y=col_name,
                 color="location",
                 title=col_name.replace("_", " ").capitalize(),
+                template="darkly",
             )
         )
 
@@ -415,8 +440,6 @@ def update_graph(option_slctd, info_slctd):
             - len(countries) * 18
         ),
         legend_groupclick="toggleitem",
-        paper_bgcolor="white",
-        plot_bgcolor="white",
     )
 
     return (fig,)
@@ -475,7 +498,7 @@ def update_graph2(countries_slctd, all_countries_slctd, info_xaxes, info_yaxes):
         parse_dates={"Dim_time.Date": {"format": "%Y/%m/%d"}},
     )
 
-    df_Dim_country = pd.read_sql_query(
+    df_dim_country = pd.read_sql_query(
         f"""
         SELECT * FROM Dim_country
         WHERE ID_Country IN ({', '.join(str(id) for id in countries_slctd)})
@@ -483,7 +506,7 @@ def update_graph2(countries_slctd, all_countries_slctd, info_xaxes, info_yaxes):
         con=conn,
     )
 
-    df = df.merge(df_Dim_country, on="iso_code")
+    df = df.merge(df_dim_country, on="iso_code")
     df = df.drop(columns=["iso_code", "ID_Country"])
 
     # ========================================================================
@@ -504,8 +527,9 @@ def update_graph2(countries_slctd, all_countries_slctd, info_xaxes, info_yaxes):
         title=f"{xaxes_title} VS {yaxes_title}",
         trendline="ols",
         trendline_scope="overall",
+        template="darkly",
     )
-    fig.update_layout(title_x=0.5, plot_bgcolor="white", legend_title_text="Country")
+    fig.update_layout(title_x=0.5, legend_title_text="Country")
     fig.update_xaxes(
         title=xaxes_title,
         title_font={"size": 16},
