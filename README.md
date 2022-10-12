@@ -6,6 +6,6 @@ Interactive dashboard made using dash components with always up to date data abo
 
 Some examples of dashboard 
 
-!(/assets/example_1)
+![First example](/assets/example_1)
 
-!(/assets/example_2)
+![Second example](/assets/example_2)
