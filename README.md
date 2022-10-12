@@ -4,7 +4,7 @@ Interactive dashboard made using dash components with always up to date data abo
 
 
 
-# Some examples of dashboard 
+## Some examples of dashboard 
 
 ![First example](/assets/example_1.png)
 
