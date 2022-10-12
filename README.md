@@ -4,6 +4,14 @@ Interactive dashboard made using dash components with always up to date covid19 
 Set what you want to see what you want
 
 
-![First example](/assets/dashboard.png)
+## Some examples of dashboard results:
+
+### Example 1
+
+![First example](/assets/example_1.png)
+
+### Example 2
+
+![First example](/assets/example_2.png)
 
 
