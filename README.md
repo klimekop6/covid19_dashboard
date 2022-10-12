@@ -8,10 +8,10 @@ Set what you want to see what you want
 
 ### Example 1
 
-![First example](/assets/example_1.png)
+![First example](/assets/example_2.png)
 
 ### Example 2
 
-![First example](/assets/example_2.png)
+![First example](/assets/example_1.png)
 
 
