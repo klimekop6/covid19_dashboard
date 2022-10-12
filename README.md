@@ -1,6 +1,7 @@
 # dash_python
 
-Interactive dashboard made using dash components with always up to date data about covid19 <br>
+Interactive dashboard made using dash components with always up to date covid19 data <br>
+Set what you want to see what you want
 
 
 
